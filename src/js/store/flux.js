@@ -1,6 +1,8 @@
+const base_URL = "https://3245-c666d49f-bc0f-4624-9edd-8edf7ff5c311.ws-us02.gitpod.io/todos";
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
+			todos: [],
 			demo: [
 				{
 					title: "FIRST",
@@ -16,6 +18,51 @@ const getState = ({ getStore, getActions, setStore }) => {
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
+
+			getTodos: async () => {
+				try {
+					const response = await fetch(`${base_URL}`);
+					if (response.ok) {
+						let todos = await response.json();
+						setStore({
+							todos: todos
+						});
+					} else {
+						alert(`response:${response.status} ${response.statusText}`);
+					}
+				} catch (error) {
+					alert(`error!: ${error}`);
+				}
+			},
+			deleteTodos: async indexItem => {
+				let response = await fetch(`${base_URL}/${indexItem}`, {
+					method: "DELETE",
+					body: JSON.stringify({}),
+					headers: {
+						"Content-Type": "application/json"
+					}
+				});
+				if (response.ok) {
+					getActions().getTodos();
+				} else {
+					alert(`Something went wrong: ${response.status}`);
+				}
+			},
+			addTask: async task => {
+				alert(task);
+				let response = await fetch(`${base_URL}`, {
+					method: "POST",
+					body: JSON.stringify(task),
+					headers: {
+						"Content-Type": "application/json"
+					}
+				});
+				if (response.ok) {
+					getActions().getTodos();
+				} else {
+					alert(`Something went wrong: ${response.status}`);
+				}
+			},
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
